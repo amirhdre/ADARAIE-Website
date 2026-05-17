@@ -1,0 +1,108 @@
+<!-- Custom cursor — fast version -->
+<div id="custom-cursor-ring" aria-hidden="true"></div>
+<div id="custom-cursor-dot" aria-hidden="true"></div>
+
+<style>
+  @media (hover: hover) and (pointer: fine) {
+    html, body, a, button, input, textarea, select, label, [role="button"] {
+      cursor: none !important;
+    }
+  }
+
+  #custom-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    margin: -3px 0 0 -3px;
+    border-radius: 50%;
+    background: #1f2937;
+    pointer-events: none;
+    z-index: 1000000;
+    will-change: transform;
+    transform: translate3d(-100px, -100px, 0);
+  }
+
+  #custom-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    margin: -18px 0 0 -18px;
+    border: 1.5px solid rgba(31, 41, 55, 0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+    will-change: transform;
+    transform: translate3d(-100px, -100px, 0);
+    transition:
+      width 0.2s ease,
+      height 0.2s ease,
+      margin 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  #custom-cursor-ring.hover {
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+    border-color: rgba(31, 41, 55, 0.75);
+  }
+
+  #custom-cursor-dot.hover { opacity: 0; }
+
+  @media (hover: none) or (pointer: coarse) {
+    #custom-cursor-dot, #custom-cursor-ring { display: none !important; }
+  }
+</style>
+
+<script>
+(function() {
+  if (window.matchMedia('(hover: none), (pointer: coarse)').matches) return;
+
+  var dot = document.getElementById('custom-cursor-dot');
+  var ring = document.getElementById('custom-cursor-ring');
+  if (!dot || !ring) return;
+
+  var mx = 0, my = 0, rx = 0, ry = 0;
+  var running = false;
+
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0)';
+    if (!running) {
+      running = true;
+      requestAnimationFrame(loop);
+    }
+  }, { passive: true });
+
+  function loop() {
+    var dx = mx - rx, dy = my - ry;
+    rx += dx * 0.5;
+    ry += dy * 0.5;
+    ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0)';
+    if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) {
+      running = false;
+      return;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  var sel = 'a, button, input, textarea, select, label, [role="button"], .btn, .crt-social a';
+  document.addEventListener('mouseover', function(e) {
+    if (e.target.closest(sel)) {
+      ring.classList.add('hover');
+      dot.classList.add('hover');
+    }
+  }, { passive: true });
+  document.addEventListener('mouseout', function(e) {
+    if (e.target.closest(sel)) {
+      ring.classList.remove('hover');
+      dot.classList.remove('hover');
+    }
+  }, { passive: true });
+})();
+</script>

@@ -1,0 +1,1344 @@
+/* ============================================================
+   MOMENTS PAGE — Complete CSS (final, iOS-fixed, no overlap)
+   Horizontal scroll polaroid carousel
+   Layout stays horizontal on mobile to prevent iOS scroll capture
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600&display=swap');
+
+/* ============================================================
+   FORCE-RESTORE TOP HEADER PADDING ON /MOMENTS
+   The page shell overrides in Part F were stripping margins
+   from the top of the page. This restores them explicitly.
+   ============================================================ */
+
+body.moments-active .crt-paper-layers {
+  margin-top: 3rem !important;
+}
+
+@media (max-width: 991px) {
+  body.moments-active .crt-paper-layers {
+    margin-top: 2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.moments-active .crt-paper-layers {
+    margin-top: 1.5rem !important;
+  }
+}
+
+/* Also ensure the header has top breathing room */
+body.moments-active .crt-head,
+body.moments-active .crt-head-wrap,
+body.moments-active #crtHead {
+  padding-top: 1.5rem !important;
+}
+
+@media (max-width: 600px) {
+  body.moments-active .crt-head,
+  body.moments-active .crt-head-wrap,
+  body.moments-active #crtHead {
+    padding-top: 1rem !important;
+  }
+}
+
+/* ============================================================
+   PART A — PAGE LAYOUT (sticky nav + content)
+   ============================================================ */
+
+.moments-page {
+  display: flex;
+  gap: 3rem;
+  align-items: flex-start;
+  padding: 1rem 0;
+}
+
+.moments-nav {
+  position: sticky;
+  top: 80px;
+  flex-shrink: 0;
+  width: 70px;
+  padding-top: 0.5rem;
+}
+
+.moments-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.moments-nav li { list-style: none; }
+
+.moments-nav-link {
+  display: block;
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #9ca3af;
+  text-decoration: none !important;
+  padding: 0.3rem 0 0.3rem 0.75rem;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+.moments-nav-link:hover {
+  color: #4f46e5;
+  border-left-color: rgba(79, 70, 229, 0.3);
+}
+
+.moments-nav-link.active {
+  color: #1f2937;
+  font-weight: 600;
+  border-left-color: #1f2937;
+}
+
+.moments-content {
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* ============================================================
+   PART B — HEADER
+   ============================================================ */
+
+.moments-header {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.moments-title {
+  font-family: 'Manrope', 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 2.25rem !important;
+  color: #1f2937 !important;
+  margin: 0 0 0.5rem 0 !important;
+  letter-spacing: 0.005em !important;
+  text-transform: none !important;
+}
+
+.moments-subtitle {
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 1.05rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+
+/* ============================================================
+   PART C — EACH EVENT BLOCK
+   ============================================================ */
+
+.moments-event {
+  margin-bottom: 0.1rem;
+  scroll-margin-top: 100px;
+}
+
+.moments-event-header { margin-bottom: 1.75rem; }
+
+.moments-year {
+  display: inline-block;
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  color: #9ca3af;
+  letter-spacing: 0.15em;
+  padding: 0.25rem 0.65rem;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+}
+
+.moments-event-title {
+  font-family: 'Manrope', 'DM Sans', sans-serif !important;
+  font-weight: 600 !important;
+  font-size: 1.4rem !important;
+  color: #1f2937 !important;
+  margin: 0 0 0.3rem 0 !important;
+  letter-spacing: 0.005em !important;
+  text-transform: none !important;
+}
+
+.moments-event-subtitle {
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-weight: 400;
+  font-size: 0.98rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+
+/* ============================================================
+   PART D — HORIZONTAL SCROLL + FADE EDGE (minimal iOS config)
+   ============================================================ */
+
+.moments-photos-wrap {
+  position: relative;
+  margin: 1rem -1rem 0 -1rem;
+}
+
+.moments-photos {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  padding: 1.5rem 1rem 2rem 1rem;
+  overflow-x: scroll;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* Enable scroll snap only on desktop where it works reliably */
+@media (hover: hover) and (pointer: fine) {
+  .moments-photos {
+    scroll-snap-type: x proximity;
+    scroll-padding-left: 1rem;
+  }
+}
+
+.moments-photos::-webkit-scrollbar {
+  height: 6px;
+}
+
+.moments-photos::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.moments-photos::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 999px;
+}
+
+.moments-photos::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Right-edge fade */
+.moments-photos-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 100px;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.moments-photos-wrap.has-right-fade::after {
+  opacity: 1;
+}
+
+/* Left-edge fade */
+.moments-photos-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 60px;
+  background: linear-gradient(
+    to left,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 5;
+}
+
+.moments-photos-wrap.has-left-fade::before {
+  opacity: 1;
+}
+
+
+/* ============================================================
+   PART E — INDIVIDUAL POLAROIDS
+   ============================================================ */
+
+.moments-polaroid {
+  flex: 0 0 auto;
+  width: 240px;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+}
+
+/* Snap alignment — only kicks in via the media query above */
+@media (hover: hover) and (pointer: fine) {
+  .moments-polaroid {
+    scroll-snap-align: start;
+  }
+}
+
+/* OVERLAP — pull every polaroid slightly into its left neighbor */
+.moments-polaroid + .moments-polaroid {
+  margin-left: -35px;
+}
+
+/* Tiny vertical jitter for organic feel */
+.moments-polaroid:nth-child(2n) {
+  margin-top: 8px;
+}
+
+.moments-polaroid:nth-child(3n) {
+  margin-top: -6px;
+}
+
+.moments-polaroid:nth-child(5n) {
+  margin-top: 12px;
+}
+
+.moments-polaroid:hover {
+  transform: rotate(0deg) translateY(-8px) scale(1.05);
+  z-index: 20;
+}
+
+.moments-frame {
+  background: #ffffff;
+  padding: 14px 14px 2px 14px;
+  border-radius: 2px;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.13),
+    0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.4s ease;
+}
+
+.moments-polaroid:hover .moments-frame {
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.moments-frame img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 1px;
+  background: #f3f4f6;
+}
+
+.moments-caption {
+  font-family: 'Caveat', cursive;
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: #4b5563;
+  text-align: center;
+  margin: 12px 0 14px 0;
+  line-height: 1.3;
+}
+
+
+/* ============================================================
+   PART F — PAGE SHELL (hide sidebar, full width)
+   ============================================================ */
+
+body.moments-active #crtSideBoxWrap,
+body.moments-active #crtSideBox,
+body.moments-active .crt-side-box-1,
+body.moments-active .crt-side-box-2 {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  visibility: hidden !important;
+  overflow: hidden !important;
+}
+
+body.moments-active #crtSidebarBtn,
+body.moments-active #crtSidebar {
+  display: none !important;
+}
+
+/* DON'T strip padding from the wrapper — it contains the top header.
+   Only the inner container (#crtContainer) should have its layout overridden. */
+body.moments-active .crt-wrapper {
+  display: block !important;
+}
+
+body.moments-active #crtContainer {
+  display: block !important;
+  position: static !important;
+  min-height: 0 !important;
+}
+
+body.moments-active .crt-container,
+body.moments-active .crt-container-sm {
+  display: block !important;
+  position: static !important;
+  float: none !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 2rem !important;
+  padding-right: 100px !important;
+  min-height: 0 !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+}
+
+body.moments-active .crt-paper-layers {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 1rem 0 !important;
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
+body.moments-active .crt-paper-layers::before,
+body.moments-active .crt-paper-layers::after {
+  display: none !important;
+}
+
+body.moments-active .crt-paper {
+  display: block !important;
+  position: static !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  min-height: 0 !important;
+}
+
+body.moments-active .crt-paper-cont,
+body.moments-active .paper-padd {
+  padding: 2.5rem !important;
+  max-width: none !important;
+  min-height: 0 !important;
+}
+
+
+/* ============================================================
+   PART G — CATEGORY FILTER PILLS
+   ============================================================ */
+
+.moments-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.moments-filter {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px) saturate(160%);
+  -webkit-backdrop-filter: blur(10px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  color: #6b7280;
+  font-family: 'Manrope', 'DM Sans', sans-serif;
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.moments-filter:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: #1f2937;
+}
+
+.moments-filter.active {
+  background: rgba(31, 41, 55, 0.92);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+
+/* ============================================================
+   PART H — SCROLL BUTTONS (tap to scroll polaroid row)
+   ============================================================ */
+
+.moments-scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(31, 41, 55, 0.92);
+  backdrop-filter: blur(14px) saturate(180%);
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 300;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.2s ease, background 0.2s ease;
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.moments-scroll-btn.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.moments-scroll-btn:hover {
+  background: rgba(17, 24, 39, 0.96);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.moments-scroll-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.moments-scroll-left {
+  left: 8px;
+  padding-right: 4px;
+}
+
+.moments-scroll-right {
+  right: 8px;
+  padding-left: 4px;
+}
+
+
+/* ============================================================
+   PART I — RESPONSIVE (tablet, mobile, tiny phones)
+   ============================================================ */
+
+@media (max-width: 991px) {
+  /* Use overflow-x: clip on outer wrappers — prevents visual overflow
+     but does NOT trap touch events the way overflow-x: hidden does */
+  body.moments-active,
+  body.moments-active .crt-wrapper,
+  body.moments-active #crtContainer,
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm {
+    overflow-x: clip !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Inner paper wrappers — no overflow restriction; just contain width */
+  body.moments-active .crt-paper-layers,
+  body.moments-active .crt-paper,
+  body.moments-active .crt-paper-cont {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Remove right-side padding (no floating nav on mobile) */
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm {
+    padding: 0 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    padding: 1.5rem 1rem !important;
+  }
+
+  .moments-page {
+    gap: 1.5rem;
+  }
+  .moments-nav {
+    width: 55px;
+  }
+  .moments-polaroid {
+    width: 210px;
+  }
+  .moments-polaroid + .moments-polaroid {
+    margin-left: -32px;
+  }
+  .moments-title {
+    font-size: 1.75rem !important;
+  }
+  .moments-caption {
+    font-size: 1.05rem;
+  }
+
+  /* Bigger scroll buttons on mobile */
+  .moments-scroll-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.9rem;
+  }
+
+  /* Always show scroll buttons on mobile — don't wait for scroll detection */
+  .moments-scroll-right {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+
+@media (max-width: 600px) {
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm {
+    padding: 0 0.5rem !important;
+  }
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    padding: 1.25rem 0.5rem !important;
+  }
+	
+.moments-caption {
+  font-size: 1.1rem !important;
+}
+
+  /* KEEP horizontal flex layout on mobile —
+     stacking vertically broke iOS scroll capture */
+  .moments-page {
+    flex-direction: row !important;
+    gap: 0.75rem !important;
+    padding: 0.5rem 0;
+    position: relative;
+  }
+
+  /* Header sits above the year nav with a soft fade background
+     so when nav scrolls behind it, the title stays readable */
+  .moments-header {
+    position: relative;
+    z-index: 5;
+    background: linear-gradient(
+      to bottom,
+      rgba(254, 252, 253, 1) 0%,
+      rgba(254, 252, 253, 0.95) 80%,
+      transparent 100%
+    );
+    margin-left: -50px;
+    padding-left: 50px;
+    margin-right: -10px;
+    padding-right: 10px;
+    margin-top: -1rem;
+    padding-top: 1rem;
+  }
+
+  /* Year nav stays a thin sticky column on the left, behind the header */
+  .moments-nav {
+    position: sticky;
+    top: 70px;
+    width: 38px !important;
+    flex-shrink: 0;
+    overflow: visible !important;
+    padding-top: 0.25rem;
+    z-index: 1;
+    align-self: flex-start;
+  }
+
+  .moments-nav ul {
+    flex-direction: column !important;
+    gap: 0.5rem;
+    padding: 0 !important;
+  }
+
+  .moments-nav-link {
+    border-left: 2px solid transparent !important;
+    border-bottom: none !important;
+    padding: 0.2rem 0 0.2rem 0.4rem !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.03em !important;
+    white-space: nowrap;
+  }
+
+  .moments-nav-link.active {
+    border-left-color: #1f2937 !important;
+    border-bottom: none !important;
+  }
+
+  /* Content takes remaining width */
+  .moments-content {
+    flex: 1;
+    min-width: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Event headers also fade behind sticky nav as they scroll past */
+  .moments-event-header {
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(
+      to bottom,
+      rgba(254, 252, 253, 0.95) 0%,
+      rgba(254, 252, 253, 0.85) 80%,
+      transparent 100%
+    );
+    margin-left: -10px;
+    padding-left: 10px;
+    margin-right: -10px;
+    padding-right: 10px;
+  }
+
+  /* Filter pills — horizontal scroll inline */
+  .moments-filters {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.4rem !important;
+    padding: 0.25rem 0 0.5rem 0 !important;
+    margin-top: 1rem !important;
+    scrollbar-width: none;
+  }
+  .moments-filters::-webkit-scrollbar {
+    display: none;
+  }
+  .moments-filter {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+    font-size: 0.78rem !important;
+    padding: 0.35rem 0.85rem !important;
+  }
+
+  /* Header text */
+  .moments-title {
+    font-size: 1.4rem !important;
+    line-height: 1.2;
+  }
+  .moments-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  /* Polaroids — smaller since width is constrained by side nav */
+  .moments-polaroid {
+    width: 220px;
+  }
+  .moments-polaroid + .moments-polaroid {
+    margin-left: -32px;
+  }
+  .moments-event {
+    margin-bottom: 2rem;
+  }
+
+  /* Fade gradients */
+  .moments-photos-wrap::after {
+    width: 60px;
+  }
+  .moments-photos-wrap::before {
+    width: 40px;
+  }
+}
+
+
+@media (max-width: 400px) {
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm {
+    padding: 0 0.25rem !important;
+  }
+  .moments-nav {
+    width: 32px !important;
+  }
+  .moments-nav-link {
+    font-size: 0.65rem !important;
+  }
+  .moments-polaroid {
+    width: 195px;
+  }
+  .moments-polaroid + .moments-polaroid {
+    margin-left: -28px;
+  }
+  .moments-title {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* ============================================================
+   PHOTOSWIPE GALLERY — chic dark backdrop styling
+   ============================================================ */
+
+/* Override PhotoSwipe's default backdrop to match the site's elegant feel */
+.pswp {
+  --pswp-bg: #0a0a0c;
+  --pswp-placeholder-bg: #1a1a1d;
+  --pswp-root-z-index: 100000;
+  --pswp-icon-color: #ffffff;
+  --pswp-icon-color-secondary: rgba(255, 255, 255, 0.4);
+  --pswp-icon-stroke-color: rgba(0, 0, 0, 0.3);
+  --pswp-icon-stroke-width: 2px;
+  --pswp-error-text-color: #ffffff;
+}
+
+/* Smooth backdrop with subtle gradient */
+.pswp__bg {
+  background: radial-gradient(
+    ellipse at center,
+    #1a1a1f 0%,
+    #0a0a0c 70%,
+    #000000 100%
+  ) !important;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/* Counter "3 / 12" at top */
+.pswp__counter {
+  font-family: 'Manrope', 'DM Sans', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.08em !important;
+  color: rgba(255, 255, 255, 0.65) !important;
+  text-shadow: none !important;
+  margin: 18px 0 0 22px !important;
+}
+
+/* Close button — subtle glass pill */
+.pswp__button--close {
+  margin-top: 8px;
+  margin-right: 12px;
+}
+
+.pswp__button {
+  transition: transform 0.2s ease, opacity 0.2s ease !important;
+}
+
+.pswp__button:hover {
+  transform: scale(1.1);
+}
+
+/* Caption styling */
+.pswp__custom-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 2rem 2rem 2rem;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: 'Caveat', cursive;
+  font-weight: 500;
+  font-size: 1.4rem;
+  text-align: center;
+  line-height: 1.4;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.3) 60%,
+    transparent 100%
+  );
+  z-index: 1080;
+}
+
+.pswp__custom-caption:empty {
+  display: none;
+}
+
+/* Smooth fade transitions */
+.pswp__img--placeholder--blank {
+  background: transparent;
+}
+
+/* Hide native zoom button — wheel/pinch is enough */
+.pswp__button--zoom {
+  display: none !important;
+}
+
+/* Arrow navigation buttons — chic glass style */
+.pswp__button--arrow {
+  width: 60px !important;
+  height: 60px !important;
+}
+
+.pswp__button--arrow:before {
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50% !important;
+  width: 48px !important;
+  height: 48px !important;
+  top: 6px !important;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pswp__button--arrow:hover:before {
+  background: rgba(255, 255, 255, 0.15) !important;
+  transform: scale(1.05);
+}
+
+/* Cursor pointer on polaroids */
+.moments-polaroid {
+  cursor: zoom-in;
+}
+
+/* On mobile, smaller arrow buttons */
+@media (max-width: 768px) {
+  .pswp__button--arrow {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .pswp__button--arrow:before {
+    width: 40px !important;
+    height: 40px !important;
+    top: 4px !important;
+  }
+  .pswp__custom-caption {
+    font-size: 1.2rem;
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+  }
+}
+
+/* ============================================================
+   MOBILE TOP PADDING FIX — give the page breathing room above
+   the "Engineering · Science · Design" logo on /moments only
+   ============================================================ */
+
+/* ============================================================
+   MOBILE — add space between the logo and the icon nav row
+   ============================================================ */
+
+/* ============================================================
+   MOBILE TOP PADDING FIX — give the page breathing room above
+   the "Engineering · Science · Design" logo on /moments only
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active {
+    padding-top: 2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.moments-active {
+    padding-top: 1.5rem !important;
+  }
+}
+
+@media (max-width: 400px) {
+  body.moments-active {
+    padding-top: 1rem !important;
+  }
+}
+@media (max-width: 991px) {
+  body.moments-active #crtLogo,
+  body.moments-active .crt-logo,
+  body.moments-active .crt-head-col-1 {
+    margin-bottom: 1.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.moments-active #crtLogo,
+  body.moments-active .crt-logo,
+  body.moments-active .crt-head-col-1 {
+    margin-bottom: 1.25rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — completely strip all container effects and margins
+   Make content flow edge-to-edge with no wrapper styling
+   ============================================================ */
+
+@media (max-width: 991px) {
+  /* Wipe every possible Certy wrapper layer */
+  body.moments-active .crt-wrapper,
+  body.moments-active #crtContainer,
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm,
+  body.moments-active .crt-paper-layers,
+  body.moments-active .crt-paper,
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd,
+  body.moments-active .paper-bg,
+  body.moments-active .paper-shadow,
+  body.moments-active .paper-border {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Remove ::before and ::after decorative pseudo-elements that
+     Certy uses for paper shadows / borders */
+  body.moments-active .crt-paper-layers::before,
+  body.moments-active .crt-paper-layers::after,
+  body.moments-active .crt-paper::before,
+  body.moments-active .crt-paper::after,
+  body.moments-active .crt-container::before,
+  body.moments-active .crt-container::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  /* Minimal padding to keep content from hugging the very edge */
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    padding: 1rem 0.75rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Even tighter on phones */
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    padding: 0.75rem 0.5rem !important;
+  }
+}
+
+@media (max-width: 400px) {
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    padding: 0.5rem 0.25rem !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — extend the .moments-header out to viewport edges
+   and prevent year nav from bleeding through
+   ============================================================ */
+
+@media (max-width: 991px) {
+  /* Stretch the header out to full screen width */
+  body.moments-active .moments-header {
+    margin-left: -1rem !important;
+    margin-right: -1rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Push header even further on phones (compensate for tighter padding) */
+  body.moments-active .moments-header {
+    margin-left: -0.5rem !important;
+    margin-right: -0.5rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    /* Solid opaque background so year nav can't bleed through */
+    background: #fefcfd !important;
+  }
+
+  /* Year nav must stay BEHIND header */
+  body.moments-active .moments-nav {
+    z-index: 0 !important;
+  }
+
+  /* Header sits firmly on top */
+  body.moments-active .moments-header {
+    position: relative;
+    z-index: 10 !important;
+  }
+}
+
+@media (max-width: 400px) {
+  body.moments-active .moments-header {
+    margin-left: -0.25rem !important;
+    margin-right: -0.25rem !important;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — force EVERY wrapper to viewport edge
+   Targets the exact Certy structure: crt-container-sm wraps everything
+   ============================================================ */
+
+@media (max-width: 991px) {
+  /* Force the outer Certy container to fill the viewport width */
+  body.moments-active .crt-container-sm,
+  body.moments-active .crt-container {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(-50vw + 50%) !important;
+    margin-right: calc(-50vw + 50%) !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    box-sizing: border-box !important;
+  }
+
+  /* All inner wrappers — no margin/padding constraint, full width */
+  body.moments-active .crt-paper-layers,
+  body.moments-active .crt-paper,
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Page content itself gets minimal padding */
+  body.moments-active .moments-page {
+    padding: 1rem 0.5rem !important;
+  }
+
+  /* Decorative paper effects gone */
+  body.moments-active .crt-paper-layers::before,
+  body.moments-active .crt-paper-layers::after,
+  body.moments-active .crt-paper::before,
+  body.moments-active .crt-paper::after {
+    display: none !important;
+    content: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  body.moments-active .crt-container-sm,
+  body.moments-active .crt-container {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  body.moments-active .moments-page {
+    padding: 0.75rem 0 !important;
+  }
+}
+
+@media (max-width: 400px) {
+  body.moments-active .crt-container-sm,
+  body.moments-active .crt-container {
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — make wrappers fully transparent so the page's
+   liquid gradient background shows through everywhere
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .crt-container,
+  body.moments-active .crt-container-sm,
+  body.moments-active .crt-paper-layers,
+  body.moments-active .crt-paper,
+  body.moments-active .crt-paper-cont,
+  body.moments-active .paper-padd,
+  body.moments-active .paper-bg,
+  body.moments-active .crt-wrapper,
+  body.moments-active #crtContainer {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Same for the moments-page container itself */
+  body.moments-active .moments-page,
+  body.moments-active .moments-content {
+    background: transparent !important;
+  }
+
+  /* And the header — keep its solid bg only if it needs to hide year nav */
+  body.moments-active .moments-header {
+    background: transparent !important;
+  }
+
+  /* Polaroids keep their white frame (they should — that's the polaroid look) */
+  /* This is intentional, not changing */
+}
+
+/* ============================================================
+   MOBILE — make event headers transparent to match the page
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .moments-event-header {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    /* Keep the layout structure but remove visual card */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* The year tag pill keeps its glass look but slightly more visible */
+  body.moments-active .moments-year {
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(8px) saturate(160%);
+    -webkit-backdrop-filter: blur(8px) saturate(160%);
+  }
+}
+
+/* ============================================================
+   MOBILE — hide the year nav sidebar entirely
+   The polaroid timeline reads top-to-bottom already; no need
+   for a duplicate "Spring 2026" floating label
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .moments-nav {
+    display: none !important;
+    width: 0 !important;
+    visibility: hidden !important;
+  }
+
+  /* Now the content can take the full width */
+  body.moments-active .moments-content {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Page no longer needs the side-by-side layout */
+  body.moments-active .moments-page {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — make .moments-content fully transparent so the page
+   gradient flows seamlessly through the entire content area
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .moments-content {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Also catch any inherited backgrounds on event sections */
+  body.moments-active .moments-event,
+  body.moments-active .moments-event-header,
+  body.moments-active .moments-photos-wrap,
+  body.moments-active .moments-photos {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+  }
+
+  /* Fade gradients on polaroid scroll edges — recolor to match
+     the liquid gradient instead of solid white */
+  body.moments-active .moments-photos-wrap::after {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(254, 252, 253, 0.6) 60%,
+      rgba(254, 252, 253, 0.85) 100%
+    ) !important;
+  }
+
+  body.moments-active .moments-photos-wrap::before {
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(254, 252, 253, 0.6) 60%,
+      rgba(254, 252, 253, 0.85) 100%
+    ) !important;
+  }
+}
+
+/* ============================================================
+   MOBILE — make .moments-page fully transparent
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .moments-page {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+/* ============================================================
+   ULTIMATE BACKGROUND KILLER — beats any other selector
+   Targets the exact element with multiple classes for higher specificity
+   ============================================================ */
+
+@media (max-width: 991px) {
+  /* Stack class names for maximum specificity */
+  body.moments-active div.crt-paper-cont,
+  body.moments-active div.paper-padd,
+  body.moments-active div.crt-paper-cont.paper-padd,
+  body.moments-active div.crt-paper-cont.paper-padd.clear-mrg,
+  body.moments-active div.crt-paper,
+  body.moments-active div.crt-paper-layers,
+  body.moments-active div.crt-paper-layers.crt-animated {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Also wipe pseudo-elements that draw decorative effects */
+  body.moments-active div.crt-paper-cont::before,
+  body.moments-active div.crt-paper-cont::after,
+  body.moments-active div.crt-paper::before,
+  body.moments-active div.crt-paper::after,
+  body.moments-active div.crt-paper-layers::before,
+  body.moments-active div.crt-paper-layers::after,
+  body.moments-active div.paper-padd::before,
+  body.moments-active div.paper-padd::after {
+    display: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    content: none !important;
+  }
+}
+
+/* ============================================================
+   OVERRIDE LIQUID GLASS THEME'S .crt-paper GRADIENT ON MOBILE
+   The liquid CSS paints .crt-paper with a white gradient + backdrop
+   filter. On /moments mobile, we want it completely transparent.
+   ============================================================ */
+
+@media (max-width: 991px) {
+  body.moments-active .crt-paper,
+  html body.moments-active .crt-paper {
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Also kill the top-edge highlight line */
+  body.moments-active .crt-paper::before,
+  html body.moments-active .crt-paper::before {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+  }
+}

@@ -1,0 +1,383 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Run only on /moments
+  if (!window.location.pathname.match(/^\/moments\/?$/)) return;
+  document.body.classList.add('moments-active');
+
+  const container = document.querySelector('.crt-paper-cont.paper-padd');
+  if (!container) return;
+
+  // Pull data from WordPress (injected by PHP snippet)
+  const timeline = window.MOMENTS_DATA || [];
+  const categories = window.MOMENTS_CATEGORIES || [];
+
+  // Empty state — show a helpful message in the editor
+  if (!timeline.length) {
+    container.innerHTML = `
+      <div class="moments-page">
+        <div class="moments-content">
+          <header class="moments-header">
+            <h1 class="moments-title">Moments</h1>
+            <p class="moments-subtitle">Add your first moment in wp-admin → Moments → Add New</p>
+          </header>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  // Page header config
+  const pageConfig = {
+    title: 'Moments',
+    subtitle: 'Snapshots from the lab, the road, and everything in between ☕'
+  };
+
+  // Rotation cycle for polaroids (subtle but varied)
+  const rotations = [-3, 2, -2, 4, -4, 3, -3, 2, -4, 3];
+
+  // ============================================================
+  // RENDER FUNCTION — called on initial load and on filter change
+  // ============================================================
+  function renderTimeline(filterCategory) {
+
+    // Filter timeline if category is selected
+    const filtered = filterCategory && filterCategory !== 'all'
+      ? timeline.filter(e => (e.categories || []).indexOf(filterCategory) !== -1)
+      : timeline;
+
+    // Build sticky year/period nav (unique periods)
+    const periods = [...new Set(filtered.map(e => e.period))];
+    let navHTML = '<nav class="moments-nav" aria-label="Timeline navigation"><ul>';
+    periods.forEach((period, i) => {
+      navHTML += `<li><a href="#period-${i}" class="moments-nav-link">${period}</a></li>`;
+    });
+    navHTML += '</ul></nav>';
+
+    // Build category filter pills
+    let filterHTML = '';
+    if (categories.length > 0) {
+      filterHTML = '<div class="moments-filters">';
+      filterHTML += `<button class="moments-filter ${!filterCategory || filterCategory === 'all' ? 'active' : ''}" data-cat="all">All</button>`;
+      categories.forEach(c => {
+        filterHTML += `<button class="moments-filter ${filterCategory === c.slug ? 'active' : ''}" data-cat="${c.slug}">${c.name}</button>`;
+      });
+      filterHTML += '</div>';
+    }
+
+    // Build the page header
+    let contentHTML = `
+      <header class="moments-header">
+        <h1 class="moments-title">${pageConfig.title}</h1>
+        <p class="moments-subtitle">${pageConfig.subtitle}</p>
+        ${filterHTML}
+      </header>
+    `;
+
+    // Build each event section
+    filtered.forEach((event, i) => {
+      let photosHTML = '';
+      event.photos.forEach((p, j) => {
+        const rotation = rotations[j % rotations.length];
+        const captionEscaped = (p.caption || '').replace(/"/g, '&quot;');
+        // POLAROID IS NOW AN <a> TAG so PhotoSwipe can bind to it
+        photosHTML += `
+          <a class="moments-polaroid" style="--rot: ${rotation}deg;" href="${p.src}" data-pswp-width="1600" data-pswp-height="1600">
+            <div class="moments-frame">
+              <img src="${p.src}" alt="${captionEscaped}" loading="lazy">
+              <p class="moments-caption">${p.caption || ''}</p>
+            </div>
+          </a>
+        `;
+      });
+
+      contentHTML += `
+        <section class="moments-event" id="period-${i}">
+          <div class="moments-event-header">
+            <span class="moments-year">${event.period}</span>
+            <h2 class="moments-event-title">${event.title}</h2>
+            ${event.subtitle ? `<p class="moments-event-subtitle">${event.subtitle}</p>` : ''}
+          </div>
+          <div class="moments-photos-wrap">
+            <div class="moments-photos">
+              ${photosHTML}
+            </div>
+          </div>
+        </section>
+      `;
+    });
+
+    // Inject the full layout into Certy's content container
+    container.innerHTML = `
+      <div class="moments-page">
+        ${navHTML}
+        <div class="moments-content">
+          ${contentHTML}
+        </div>
+      </div>
+    `;
+
+    // ============================================================
+    // PHOTOSWIPE — gallery lightbox for polaroids
+    // CORRECT LOCATION: inside renderTimeline, after innerHTML is set
+    // ============================================================
+    if (!window.__photoswipeLoaded) {
+      window.__photoswipeLoaded = true;
+
+      const psCss = document.createElement('link');
+      psCss.rel = 'stylesheet';
+      psCss.href = 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.css';
+      document.head.appendChild(psCss);
+
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.textContent = `
+        import PhotoSwipeLightbox from 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe-lightbox.esm.min.js';
+        import PhotoSwipe from 'https://cdn.jsdelivr.net/npm/photoswipe@5.4.4/dist/photoswipe.esm.min.js';
+
+        window.__initPhotoSwipe = function() {
+          if (window.__lightbox) window.__lightbox.destroy();
+
+          const lightbox = new PhotoSwipeLightbox({
+            gallery: '.moments-photos',
+            children: '.moments-polaroid',
+            pswpModule: PhotoSwipe,
+            showHideAnimationType: 'zoom',
+            bgOpacity: 0.92,
+            spacing: 0.1,
+            loop: true,
+            wheelToZoom: true,
+            padding: { top: 40, bottom: 40, left: 20, right: 20 },
+          });
+
+          lightbox.on('uiRegister', function() {
+            lightbox.pswp.ui.registerElement({
+              name: 'custom-caption',
+              order: 9,
+              isButton: false,
+              appendTo: 'root',
+              html: '',
+              onInit: (el, pswp) => {
+                lightbox.pswp.on('change', () => {
+                  const currSlideElement = lightbox.pswp.currSlide.data.element;
+                  let caption = '';
+                  if (currSlideElement) {
+                    const img = currSlideElement.querySelector('img');
+                    if (img && img.alt) caption = img.alt;
+                  }
+                  el.innerHTML = caption || '';
+                });
+              }
+            });
+          });
+
+          lightbox.init();
+          window.__lightbox = lightbox;
+        };
+
+        if (window.__initPhotoSwipe) window.__initPhotoSwipe();
+      `;
+      document.head.appendChild(script);
+    } else if (typeof window.__initPhotoSwipe === 'function') {
+      // PhotoSwipe already loaded — just re-init for the new DOM
+      setTimeout(window.__initPhotoSwipe, 50);
+    }
+
+    // Update real image dimensions for PhotoSwipe (after images load)
+    document.querySelectorAll('.moments-polaroid').forEach(polaroid => {
+      const img = polaroid.querySelector('img');
+      if (!img) return;
+      const setSize = () => {
+        const w = img.naturalWidth || 1600;
+        const h = img.naturalHeight || 1600;
+        polaroid.setAttribute('data-pswp-width', w);
+        polaroid.setAttribute('data-pswp-height', h);
+      };
+      if (img.complete && img.naturalWidth > 0) setSize();
+      else img.addEventListener('load', setSize, { once: true });
+    });
+
+    // --------------------------------------------------------
+    // Wire up scroll fades, scroll buttons, AND manual touch swipe
+    // --------------------------------------------------------
+    document.querySelectorAll('.moments-photos-wrap').forEach(wrap => {
+      const scroller = wrap.querySelector('.moments-photos');
+      if (!scroller) return;
+
+      const btnLeft = document.createElement('button');
+      btnLeft.className = 'moments-scroll-btn moments-scroll-left';
+      btnLeft.setAttribute('aria-label', 'Scroll left');
+      btnLeft.innerHTML = '‹';
+
+      const btnRight = document.createElement('button');
+      btnRight.className = 'moments-scroll-btn moments-scroll-right';
+      btnRight.setAttribute('aria-label', 'Scroll right');
+      btnRight.innerHTML = '›';
+
+      wrap.appendChild(btnLeft);
+      wrap.appendChild(btnRight);
+
+      const scrollAmount = () => Math.min(scroller.clientWidth * 0.8, 400);
+
+      btnLeft.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        scroller.scrollBy({ left: -scrollAmount(), behavior: 'smooth' });
+      });
+
+      btnRight.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        scroller.scrollBy({ left: scrollAmount(), behavior: 'smooth' });
+      });
+
+      // ----------------------------------------------------------
+      // Manual touch swipe handler — bypasses iOS scroll quirks
+      // ----------------------------------------------------------
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let scrollStartLeft = 0;
+      let isHorizontalSwipe = null;
+      let isDragging = false;
+      let lastTouchX = 0;
+      let lastTouchTime = 0;
+      let velocity = 0;
+      let momentumFrame = null;
+
+      scroller.addEventListener('touchstart', (e) => {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        scrollStartLeft = scroller.scrollLeft;
+        isHorizontalSwipe = null;
+        isDragging = true;
+        lastTouchX = touchStartX;
+        lastTouchTime = Date.now();
+        velocity = 0;
+
+        if (momentumFrame) {
+          cancelAnimationFrame(momentumFrame);
+          momentumFrame = null;
+        }
+      }, { passive: true });
+
+      scroller.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const deltaX = currentX - touchStartX;
+        const deltaY = currentY - touchStartY;
+
+        if (isHorizontalSwipe === null) {
+          if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+            isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+          }
+        }
+
+        if (isHorizontalSwipe === true) {
+          scroller.scrollLeft = scrollStartLeft - deltaX;
+
+          const now = Date.now();
+          const dt = now - lastTouchTime;
+          if (dt > 0) {
+            velocity = (lastTouchX - currentX) / dt;
+          }
+          lastTouchX = currentX;
+          lastTouchTime = now;
+
+          if (e.cancelable) e.preventDefault();
+        }
+      }, { passive: false });
+
+      scroller.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        isDragging = false;
+
+        if (isHorizontalSwipe !== true) return;
+
+        if (Math.abs(velocity) > 0.05) {
+          let v = velocity * 16;
+          const decay = 0.94;
+
+          const animate = () => {
+            v *= decay;
+            scroller.scrollLeft += v;
+            if (Math.abs(v) > 0.5) {
+              momentumFrame = requestAnimationFrame(animate);
+            } else {
+              momentumFrame = null;
+            }
+          };
+          momentumFrame = requestAnimationFrame(animate);
+        }
+      }, { passive: true });
+
+      scroller.addEventListener('touchcancel', () => {
+        isDragging = false;
+        isHorizontalSwipe = null;
+      }, { passive: true });
+
+      // ----------------------------------------------------------
+      // Combined update: fade edges + button visibility
+      // ----------------------------------------------------------
+      const update = () => {
+        const sl = scroller.scrollLeft;
+        const max = scroller.scrollWidth - scroller.clientWidth;
+        const hasMoreRight = max > 2 && sl < max - 2;
+        const hasMoreLeft = sl > 2;
+
+        wrap.classList.toggle('has-right-fade', hasMoreRight);
+        wrap.classList.toggle('has-left-fade', hasMoreLeft);
+
+        btnLeft.classList.toggle('visible', hasMoreLeft);
+        btnRight.classList.toggle('visible', hasMoreRight);
+      };
+
+      update();
+      scroller.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update, { passive: true });
+    });
+
+    // --------------------------------------------------------
+    // Year nav — highlight active section on scroll
+    // --------------------------------------------------------
+    const links = document.querySelectorAll('.moments-nav-link');
+    const sections = document.querySelectorAll('.moments-event');
+
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const activeLink = document.querySelector(`a[href="#${entry.target.id}"]`);
+            if (activeLink) activeLink.classList.add('active');
+          }
+        });
+      }, { rootMargin: '-30% 0px -60% 0px' });
+      sections.forEach(s => observer.observe(s));
+    }
+
+    // Smooth scroll when year nav is clicked
+    links.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    // Wire up filter pills — clicking re-renders with that filter
+    document.querySelectorAll('.moments-filter').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.cat;
+        renderTimeline(cat);
+      });
+    });
+  }
+
+  // Initial render — show all moments
+  renderTimeline('all');
+
+});
+</script>
